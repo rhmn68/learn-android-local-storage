@@ -34,7 +34,12 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.title = "Notes"
         rv_notes.layoutManager = LinearLayoutManager(this)
         rv_notes.setHasFixedSize(true)
-        adapter = NoteAdapter(this)
+        adapter = NoteAdapter(this){note, position ->
+            val intent = Intent(this, NoteAddUpdateActivity::class.java)
+            intent.putExtra(NoteAddUpdateActivity.EXTRA_POSITION, position)
+            intent.putExtra(NoteAddUpdateActivity.EXTRA_NOTE, note)
+            startActivityForResult(intent, NoteAddUpdateActivity.REQUEST_UPDATE)
+        }
         rv_notes.adapter = adapter
 
         fab_add.setOnClickListener {
@@ -45,15 +50,7 @@ class MainActivity : AppCompatActivity() {
         noteHelper = NoteHelper.getInstance(applicationContext)
         noteHelper.open()
 
-        if (savedInstanceState == null) {
-            // proses ambil data
-            loadNotesAsync()
-        } else {
-            val list = savedInstanceState.getParcelableArrayList<Note>(EXTRA_STATE)
-            if (list != null) {
-                adapter.listNotes = list
-            }
-        }
+        loadNotesAsync()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -76,12 +73,6 @@ class MainActivity : AppCompatActivity() {
                 adapter.listNotes = ArrayList()
                 showSnackBarMessage("Tidak ada data saat ini")
             }
-        }
-
-        val cursor = noteHelper.queryAll()
-        while (cursor.moveToNext()){
-            val data = cursor.getString(2)
-            Log.d("coba", "data : $data")
         }
     }
 

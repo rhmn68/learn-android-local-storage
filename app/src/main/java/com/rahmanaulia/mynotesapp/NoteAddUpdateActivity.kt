@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -57,7 +58,6 @@ class NoteAddUpdateActivity : AppCompatActivity(), View.OnClickListener {
         if (isEdit){
             actionBarTitle = "Ubah"
             btnTitle = "Update"
-
             note?.let { edt_title.setText(it.title) }
             note?.let { edt_description.setText(it.description) }
         }else{
@@ -67,6 +67,7 @@ class NoteAddUpdateActivity : AppCompatActivity(), View.OnClickListener {
 
         supportActionBar?.title = actionBarTitle
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
 
         btn_submit.text = btnTitle
     }
@@ -154,6 +155,7 @@ class NoteAddUpdateActivity : AppCompatActivity(), View.OnClickListener {
                 note?.date = getCurrentDate()
                 values.put(DATE, getCurrentDate())
                 val result = noteHelper.insert(values)
+                Log.d("coba", "result : ${result.toInt()}")
                 if (result > 0) {
                     note?.id = result.toInt()
                     setResult(RESULT_ADD, intent)

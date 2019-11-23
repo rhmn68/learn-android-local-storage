@@ -12,7 +12,7 @@ import com.rahmanaulia.mynotesapp.R
 import com.rahmanaulia.mynotesapp.entity.Note
 import kotlinx.android.synthetic.main.item_note.view.*
 
-class NoteAdapter(private val activity: Activity) : RecyclerView.Adapter<NoteAdapter.NoteViewHolder>(){
+class NoteAdapter(private val activity: Activity, val listener:(Note, Int) -> Unit) : RecyclerView.Adapter<NoteAdapter.NoteViewHolder>(){
     var listNotes = ArrayList<Note>()
         set(listNotes) {
             if (listNotes.size > 0) {
@@ -27,7 +27,7 @@ class NoteAdapter(private val activity: Activity) : RecyclerView.Adapter<NoteAda
     override fun getItemCount(): Int = this.listNotes.size
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
-        holder.bind(listNotes[position])
+        holder.bind(listNotes[position], listener)
     }
 
     fun addItem(note: Note){
@@ -47,20 +47,26 @@ class NoteAdapter(private val activity: Activity) : RecyclerView.Adapter<NoteAda
     }
 
     inner class NoteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        fun bind(note: Note){
+        fun bind(
+            note: Note,
+            listener: (Note, Int) -> Unit
+        ){
             with(itemView){
                 tv_item_title.text = note.title
                 tv_item_date.text = note.date
                 tv_item_description.text = note.description
-                cv_item_note.setOnClickListener(CustomOnItemClickListener(adapterPosition, object : CustomOnItemClickListener.OnItemCallback{
-                    override fun onItemClicked(view: View?, position: Int) {
-                        val intent = Intent(activity, NoteAddUpdateActivity::class.java)
-                        intent.putExtra(NoteAddUpdateActivity.EXTRA_POSITION, position)
-                        intent.putExtra(NoteAddUpdateActivity.EXTRA_NOTE, note)
-                        activity.startActivityForResult(intent, NoteAddUpdateActivity.REQUEST_UPDATE)
-                    }
-
-                }))
+//                cv_item_note.setOnClickListener(CustomOnItemClickListener(adapterPosition, object : CustomOnItemClickListener.OnItemCallback{
+//                    override fun onItemClicked(view: View?, position: Int) {
+//                        val intent = Intent(activity, NoteAddUpdateActivity::class.java)
+//                        intent.putExtra(NoteAddUpdateActivity.EXTRA_POSITION, position)
+//                        intent.putExtra(NoteAddUpdateActivity.EXTRA_NOTE, note)
+//                        activity.startActivityForResult(intent, NoteAddUpdateActivity.REQUEST_UPDATE)
+//                    }
+//
+//                }))
+                this.setOnClickListener {
+                    listener(note, adapterPosition)
+                }
             }
         }
     }
